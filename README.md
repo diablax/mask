@@ -103,6 +103,7 @@ invokes cmake commands as needed.
 #### On Linux and OS X
 
 * Install the dependencies
+* For 'release-static' make sure to install `zmq.hpp` from https://github.com/zeromq/cppzmq
 * Change to the root of the source code directory and build:
 
         cd maze
