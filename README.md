@@ -1,6 +1,6 @@
-# Maze
+# Mask
 
-Copyright (c) 2018 The Maze Project.
+Copyright (c) 2018 The Mask Project.
 
 Copyright (c) 2014-2018 The Monero Project.
 
@@ -8,7 +8,7 @@ Portions Copyright (c) 2012-2013 The Cryptonote developers.
 
 ## Development resources
 
-- GitHub: [https://github.com/maze-project/maze](https://github.com/maze-project/maze)
+- GitHub: [https://github.com/mask-project/mask](https://github.com/mask-project/mask)
 
 ## Coverage
 
@@ -18,23 +18,23 @@ Portions Copyright (c) 2012-2013 The Cryptonote developers.
 
 ## Introduction
 
-Maze is a *highly* private, secure, untraceable, decentralised digital currency with a default 60-mixin. You are your bank, you control your funds, and nobody can trace your transfers unless you allow them to do so.
+Mask is a *highly* private, secure, untraceable, decentralised digital currency with a default 60-mixin. You are your bank, you control your funds, and nobody can trace your transfers unless you allow them to do so.
 
-**Privacy:** Maze uses a cryptographically sound system to allow you to send and receive funds without your transactions being easily revealed on the blockchain (the ledger of transactions that everyone has). This ensures that your purchases, receipts, and all transfers remain absolutely private by default.
+**Privacy:** Mask uses a cryptographically sound system to allow you to send and receive funds without your transactions being easily revealed on the blockchain (the ledger of transactions that everyone has). This ensures that your purchases, receipts, and all transfers remain absolutely private by default.
 
 **Security:** Using the power of a distributed peer-to-peer consensus network, every transaction on the network is cryptographically secured. Individual wallets have a 25 word mnemonic seed that is only displayed once, and can be written down to backup the wallet. Wallet files are encrypted with a passphrase to ensure they are useless if stolen.
 
-**Untraceability:** By taking advantage of ring signatures, a special property of a certain type of cryptography, Maze is able to ensure that transactions are not only untraceable, but have an optional measure of ambiguity that ensures that transactions cannot easily be tied back to an individual user or computer.
+**Untraceability:** By taking advantage of ring signatures, a special property of a certain type of cryptography, Mask is able to ensure that transactions are not only untraceable, but have an optional measure of ambiguity that ensures that transactions cannot easily be tied back to an individual user or computer.
 
-**Scalability:** By taking advantage of ring signatures, a special property of a certain type of cryptography, Maze is able to ensure that transactions are not only untraceable, but have an optional measure of ambiguity that ensures that transactions cannot easily be tied back to an individual user or computer.
+**Scalability:** By taking advantage of ring signatures, a special property of a certain type of cryptography, Mask is able to ensure that transactions are not only untraceable, but have an optional measure of ambiguity that ensures that transactions cannot easily be tied back to an individual user or computer.
 
 ## About this project
 
-This is the core implementation of Maze. It is open source and completely free to use without restrictions, except for those specified in the license agreement below. There are no restrictions on anyone creating an alternative implementation of Maze that uses the protocol and network in a compatible manner.
+This is the core implementation of Mask. It is open source and completely free to use without restrictions, except for those specified in the license agreement below. There are no restrictions on anyone creating an alternative implementation of Mask that uses the protocol and network in a compatible manner.
 
 As with many development projects, the repository on Github is considered to be the "staging" area for the latest changes. Before changes are merged into that branch on the main repository, they are tested by individual developers in their own branches, submitted as a pull request, and then subsequently tested by contributors who focus on testing and code reviews. That having been said, the repository should be carefully considered before using it in a production environment, unless there is a patch in the repository for a particular show-stopping issue you are experiencing. It is generally a better idea to use a tagged release for stability.
 
-**Anyone is welcome to contribute to Maze's codebase!** If you have a fix or code change, feel free to submit it as a pull request directly to the "master" branch. In cases where the change is relatively small or does not affect other parts of the codebase it may be merged in immediately by any one of the collaborators. On the other hand, if the change is particularly large or complex, it is expected that it will be discussed at length either well in advance of the pull request being submitted, or even directly on the pull request.
+**Anyone is welcome to contribute to Mask's codebase!** If you have a fix or code change, feel free to submit it as a pull request directly to the "master" branch. In cases where the change is relatively small or does not affect other parts of the codebase it may be merged in immediately by any one of the collaborators. On the other hand, if the change is particularly large or complex, it is expected that it will be discussed at length either well in advance of the pull request being submitted, or even directly on the pull request.
 
 ## License
 
@@ -48,7 +48,7 @@ If you want to help out, see [CONTRIBUTING](CONTRIBUTING.md) for a set of guidel
 
 Approximately three months prior to a scheduled software upgrade, a branch from Master will be created with the new release version tag. Pull requests that address bugs should then be made to both Master and the new release branch. Pull requests that require extensive review and testing (generally, optimizations and new features) should *not* be made to the release branch.
 
-## Compiling Maze from source
+## Compiling Mask from source
 
 ### Dependencies
 
@@ -89,15 +89,15 @@ build the library binary manually. This can be done with the following command `
 
 Clone recursively to pull-in needed submodule(s):
 
-`$ git clone --recursive https://github.com/maze-project/maze`
+`$ git clone --recursive https://github.com/mask-project/mask`
 
 If you already have a repo cloned, initialize and update:
 
-`$ cd maze && git submodule init && git submodule update`
+`$ cd mask && git submodule init && git submodule update`
 
 ### Build instructions
 
-Maze uses the CMake build system and a top-level [Makefile](Makefile) that
+Mask uses the CMake build system and a top-level [Makefile](Makefile) that
 invokes cmake commands as needed.
 
 #### On Linux and OS X
@@ -106,7 +106,7 @@ invokes cmake commands as needed.
 * For 'release-static' make sure to install `zmq.hpp` from https://github.com/zeromq/cppzmq
 * Change to the root of the source code directory and build:
 
-        cd maze
+        cd mask
         make
 
     *Optional*: If your machine has several cores and enough memory, enable
@@ -119,9 +119,9 @@ invokes cmake commands as needed.
 
 * The resulting executables can be found in `build/release/bin`
 
-* Add `PATH="$PATH:$HOME/maze/build/release/bin"` to `.profile`
+* Add `PATH="$PATH:$HOME/mask/build/release/bin"` to `.profile`
 
-* Run Maze with `mazed --detach`
+* Run Mask with `maskd --detach`
 
 * **Optional**: build and run the test suite to verify the binaries:
 
@@ -248,16 +248,16 @@ cmake ..
 doas make install
 ```
 
-Build maze: `env DEVELOPER_LOCAL_TOOLS=1 BOOST_ROOT=/usr/local make release-static`
+Build mask: `env DEVELOPER_LOCAL_TOOLS=1 BOOST_ROOT=/usr/local make release-static`
 
 ### On Linux for Android (using docker):
 
         # Build image (select android64.Dockerfile for aarch64)
-        cd utils/build_scripts/ && docker build -f android32.Dockerfile -t maze-android .
+        cd utils/build_scripts/ && docker build -f android32.Dockerfile -t mask-android .
         # Create container
-        docker create -it --name maze-android maze-android bash
+        docker create -it --name mask-android mask-android bash
         # Get binaries
-        docker cp maze-android:/opt/android/maze/build/release/bin .
+        docker cp mask-android:/opt/android/mask/build/release/bin .
 
 ### Building portable statically linked binaries
 
@@ -271,15 +271,15 @@ By default, in either dynamically or statically linked builds, binaries target t
 * ```make release-static-win64``` builds binaries on 64-bit Windows portable across 64-bit Windows systems
 * ```make release-static-win32``` builds binaries on 64-bit or 32-bit Windows portable across 32-bit Windows systems
 
-## Running mazed
+## Running maskd
 
 The build places the binary in `bin/` sub-directory within the build directory
 from which cmake was invoked (repository root by default). To run in
 foreground:
 
-    ./bin/mazed
+    ./bin/maskd
 
-To list all available options, run `./bin/mazed --help`.  Options can be
+To list all available options, run `./bin/maskd --help`.  Options can be
 specified either on the command line or in a configuration file passed by the
 `--config-file` argument.  To specify an option in the configuration file, add
 a line with the syntax `argumentname=value`, where `argumentname` is the name
@@ -287,17 +287,17 @@ of the argument without the leading dashes, for example `log-level=1`.
 
 To run in background:
 
-    ./bin/mazed --log-file mazed.log --detach
+    ./bin/maskd --log-file maskd.log --detach
 
 To run as a systemd service, copy
-[mazed.service](utils/systemd/mazed.service) to `/etc/systemd/system/` and
-[mazed.conf](utils/conf/mazed.conf) to `/etc/`. The [example
-service](utils/systemd/mazed.service) assumes that the user `maze` exists
+[maskd.service](utils/systemd/maskd.service) to `/etc/systemd/system/` and
+[maskd.conf](utils/conf/maskd.conf) to `/etc/`. The [example
+service](utils/systemd/maskd.service) assumes that the user `mask` exists
 and its home is the data directory specified in the [example
-config](utils/conf/mazed.conf).
+config](utils/conf/maskd.conf).
 
 If you're on Mac, you may need to add the `--max-concurrency 1` option to
-maze-wallet-cli, and possibly mazed, if you get crashes refreshing.
+mask-wallet-cli, and possibly maskd, if you get crashes refreshing.
 
 ## Internationalization
 
@@ -305,29 +305,29 @@ See [README.i18n.md](README.i18n.md).
 
 ## Using Tor
 
-While Maze isn't made to integrate with Tor, it can be used wrapped with torsocks, by
+While Mask isn't made to integrate with Tor, it can be used wrapped with torsocks, by
 setting the following configuration parameters and environment variables:
 
 * `--p2p-bind-ip 127.0.0.1` on the command line or `p2p-bind-ip=127.0.0.1` in
-  mazed.conf to disable listening for connections on external interfaces.
-* `--no-igd` on the command line or `no-igd=1` in mazed.conf to disable IGD
+  maskd.conf to disable listening for connections on external interfaces.
+* `--no-igd` on the command line or `no-igd=1` in maskd.conf to disable IGD
   (UPnP port forwarding negotiation), which is pointless with Tor.
 * `DNS_PUBLIC=tcp` or `DNS_PUBLIC=tcp://x.x.x.x` where x.x.x.x is the IP of the
   desired DNS server, for DNS requests to go over TCP, so that they are routed
-  through Tor. When IP is not specified, mazed uses the default list of
+  through Tor. When IP is not specified, maskd uses the default list of
   servers defined in [src/common/dns_utils.cpp](src/common/dns_utils.cpp).
-* `TORSOCKS_ALLOW_INBOUND=1` to tell torsocks to allow mazed to bind to interfaces
+* `TORSOCKS_ALLOW_INBOUND=1` to tell torsocks to allow maskd to bind to interfaces
    to accept connections from the wallet. On some Linux systems, torsocks
    allows binding to localhost by default, so setting this variable is only
    necessary to allow binding to local LAN/VPN interfaces to allow wallets to
    connect from remote hosts. On other systems, it may be needed for local wallets
    as well.
 * Do NOT pass `--detach` when running through torsocks with systemd, (see
-  [utils/systemd/mazed.service](utils/systemd/mazed.service) for details).
+  [utils/systemd/maskd.service](utils/systemd/maskd.service) for details).
 
-Example command line to start mazed through Tor:
+Example command line to start maskd through Tor:
 
-    DNS_PUBLIC=tcp torsocks mazed --p2p-bind-ip 127.0.0.1 --no-igd
+    DNS_PUBLIC=tcp torsocks maskd --p2p-bind-ip 127.0.0.1 --no-igd
 
 ### Using Tor on Tails
 
@@ -336,12 +336,12 @@ to add a rule to allow this connection too, in addition to telling torsocks to
 allow inbound connections. Full example:
 
     sudo iptables -I OUTPUT 2 -p tcp -d 127.0.0.1 -m tcp --dport 18081 -j ACCEPT
-    DNS_PUBLIC=tcp torsocks ./mazed --p2p-bind-ip 127.0.0.1 --no-igd --rpc-bind-ip 127.0.0.1 \
+    DNS_PUBLIC=tcp torsocks ./maskd --p2p-bind-ip 127.0.0.1 --no-igd --rpc-bind-ip 127.0.0.1 \
         --data-dir /home/amnesia/Persistent/your/directory/to/the/blockchain
 
 ## Debugging
 
-This section contains general instructions for debugging failed installs or problems encountered with Maze. First ensure you are running the latest version built from the Github repo.
+This section contains general instructions for debugging failed installs or problems encountered with Mask. First ensure you are running the latest version built from the Github repo.
 
 ### Obtaining stack traces and core dumps on Unix systems
 
@@ -354,7 +354,7 @@ Run the build.
 Once it stalls, enter the following command:
 
 ```
-gdb /path/to/mazed `pidof mazed`
+gdb /path/to/maskd `pidof maskd`
 ```
 
 Type `thread apply all bt` within gdb in order to obtain the stack trace
@@ -367,27 +367,27 @@ Enter `echo core | sudo tee /proc/sys/kernel/core_pattern` to stop cores from be
 
 Run the build.
 
-When it terminates with an output along the lines of "Segmentation fault (core dumped)", there should be a core dump file in the same directory as mazed. It may be named just `core`, or `core.xxxx` with numbers appended.
+When it terminates with an output along the lines of "Segmentation fault (core dumped)", there should be a core dump file in the same directory as maskd. It may be named just `core`, or `core.xxxx` with numbers appended.
 
 You can now analyse this core dump with `gdb` as follows:
 
-`gdb /path/to/mazed /path/to/dumpfile`
+`gdb /path/to/maskd /path/to/dumpfile`
 
 Print the stack trace with `bt`
 
-* To run maze within gdb:
+* To run mask within gdb:
 
-Type `gdb /path/to/mazed`
+Type `gdb /path/to/maskd`
 
 Pass command-line options with `--args` followed by the relevant arguments
 
-Type `run` to run mazed
+Type `run` to run maskd
 
 ### Analysing memory corruption
 
 We use the tool `valgrind` for this.
 
-Run with `valgrind /path/to/mazed`. It will be slow.
+Run with `valgrind /path/to/maskd`. It will be slow.
 
 ### LMDB
 
@@ -395,7 +395,7 @@ Instructions for debugging suspected blockchain corruption as per @HYC
 
 There is an `mdb_stat` command in the LMDB source that can print statistics about the database but it's not routinely built. This can be built with the following command:
 
-`cd ~/maze/external/db_drivers/liblmdb && make`
+`cd ~/mask/external/db_drivers/liblmdb && make`
 
 The output of `mdb_stat -ea <path to blockchain dir>` will indicate inconsistencies in the blocks, block_heights and block_info table.
 

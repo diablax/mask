@@ -1147,8 +1147,8 @@ Denna transaktion låses upp vid block %llu, om ungefär %s dagar (förutsatt en
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="679"/>
-        <source>Current fee is %s maze per kB</source>
-        <translation>Aktuell avgift är %s maze per kB</translation>
+        <source>Current fee is %s mask per kB</source>
+        <translation>Aktuell avgift är %s mask per kB</translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="695"/>
@@ -1559,8 +1559,8 @@ Denna transaktion låses upp vid block %llu, om ungefär %s dagar (förutsatt en
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="1622"/>
-        <source>Donate &lt;amount&gt; to the development team (donate.getmaze.org).</source>
-        <translation>Donera &lt;belopp&gt; till utvecklingsteamet (donate.getmaze.org).</translation>
+        <source>Donate &lt;amount&gt; to the development team (donate.getmask.org).</source>
+        <translation>Donera &lt;belopp&gt; till utvecklingsteamet (donate.getmask.org).</translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="1625"/>
@@ -1702,8 +1702,8 @@ Om argumentet &quot;tag_description&quot; anges, så tilldelas taggen &lt;taggna
    Set the fee too default/unimportant/normal/elevated/priority.
  confirm-missing-payment-id &lt;1|0>
  ask-password &lt;1|0>
- unit &lt;maze|millimaze|micromaze|nanomaze|picomaze>
-   Set the default maze (sub-)unit.
+ unit &lt;mask|millimask|micromask|nanomask|picomask>
+   Set the default mask (sub-)unit.
  min-outputs-count [n]
    Try to keep at least that many outputs of value at least min-outputs-value.
  min-outputs-value [n]
@@ -1737,8 +1737,8 @@ Om argumentet &quot;tag_description&quot; anges, så tilldelas taggen &lt;taggna
    Sätt avgiften till default/unimportant/normal/elevated/priority.
  confirm-missing-payment-id &lt;1|0>
  ask-password &lt;1|0>
- unit &lt;maze|millimaze|micromaze|nanomaze|picomaze>
-   Ange standardvärde för mazeenhet.
+ unit &lt;mask|millimask|micromask|nanomask|picomask>
+   Ange standardvärde för maskenhet.
  min-outputs-count [n]
    Försök att behålla åtminstone så många utgångar med åtminstone värdet min-outputs-value.
  min-outputs-value [n]
@@ -2205,7 +2205,7 @@ Annars bevisar du reserven för det minsta möjliga belopp över &lt;belopp&gt; 
 To start synchronizing with the daemon, use the &quot;refresh&quot; command.
 Use the &quot;help&quot; command to see the list of available commands.
 Use &quot;help &lt;command>&quot; to see a command&apos;s documentation.
-Always use the &quot;exit&quot; command when closing maze-wallet-cli to save
+Always use the &quot;exit&quot; command when closing mask-wallet-cli to save
 your current session&apos;s state. Otherwise, you might need to synchronize 
 your wallet again (your wallet keys are NOT at risk in any case).
 </source>
@@ -2213,7 +2213,7 @@ your wallet again (your wallet keys are NOT at risk in any case).
 Använd kommandot &quot;refresh&quot; för att starta synkronisering med daemonen.
 Använd kommandot &quot;help&quot; för att visa en lista över tillgängliga kommandon.
 Använd &quot;help &lt;kommando>&quot; för att visa dokumentation för kommandot.
-Använd alltid kommandot &quot;exit&quot; när du stänger maze-wallet-cli så att ditt aktuella sessionstillstånd sparas. Annars kan du bli tvungen att synkronisera
+Använd alltid kommandot &quot;exit&quot; när du stänger mask-wallet-cli så att ditt aktuella sessionstillstånd sparas. Annars kan du bli tvungen att synkronisera
 din plånbok igen (din plånboks nycklar är dock INTE hotade i vilket fall som helst).
 </translation>
     </message>
@@ -2609,8 +2609,8 @@ Varning: Några ingångsnycklar som spenderas kommer från </translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="1923"/>
-        <source>maze, millimaze, micromaze, nanomaze, picomaze</source>
-        <translation>maze, millimaze, micromaze, nanomaze, picomaze</translation>
+        <source>mask, millimask, micromask, nanomask, picomask</source>
+        <translation>mask, millimask, micromask, nanomask, picomask</translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="1975"/>
@@ -3759,8 +3759,8 @@ Utgångar per *: </translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="129"/>
-        <source>The newly created transaction will not be relayed to the maze network</source>
-        <translation>Den nyss skapade transaktionen kommer inte att skickas vidare till maze-nätverket</translation>
+        <source>The newly created transaction will not be relayed to the mask network</source>
+        <translation>Den nyss skapade transaktionen kommer inte att skickas vidare till mask-nätverket</translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="171"/>
@@ -3779,9 +3779,9 @@ Utgångar per *: </translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="6787"/>
-        <source>This is the command line maze wallet. It needs to connect to a maze
+        <source>This is the command line mask wallet. It needs to connect to a mask
 daemon to work correctly.</source>
-        <translation>Detta är kommandoradsplånboken för Maze. Den måste ansluta till en Maze-
+        <translation>Detta är kommandoradsplånboken för Mask. Den måste ansluta till en Mask-
 daemon för att fungera korrekt.</translation>
     </message>
     <message>
@@ -4023,9 +4023,9 @@ daemon för att fungera korrekt.</translation>
     </message>
     <message>
         <location filename="../src/wallet/wallet_rpc_server.cpp" line="2870"/>
-        <source>This is the RPC maze wallet. It needs to connect to a maze
+        <source>This is the RPC mask wallet. It needs to connect to a mask
 daemon to work correctly.</source>
-        <translation>Detta är RPC-plånboken för maze. Den måste ansluta till en Maze-
+        <translation>Detta är RPC-plånboken för mask. Den måste ansluta till en Mask-
 daemon för att fungera korrekt.</translation>
     </message>
     <message>
@@ -4132,9 +4132,9 @@ daemon för att fungera korrekt.</translation>
     </message>
     <message>
         <location filename="../src/wallet/wallet_args.cpp" line="138"/>
-        <source>This is the command line maze wallet. It needs to connect to a maze
+        <source>This is the command line mask wallet. It needs to connect to a mask
 daemon to work correctly.</source>
-        <translation>Detta är kommandoradsplånboken för Maze. Den måste ansluta till en Maze-
+        <translation>Detta är kommandoradsplånboken för Mask. Den måste ansluta till en Mask-
 daemon för att fungera korrekt.</translation>
     </message>
     <message>

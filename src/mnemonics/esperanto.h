@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2018, The Maze Project
+// Copyright (c) 2017-2018, The Mask Project
 // Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
@@ -1095,7 +1095,7 @@ namespace Language
       "mokadi",
       "molaro",
       "momento",
-      "maze",
+      "mask",
       "mopso",
       "mordi",
       "moskito",

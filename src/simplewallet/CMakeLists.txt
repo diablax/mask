@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2018, The Maze Project
+# Copyright (c) 2017-2018, The Mask Project
 # Copyright (c) 2014-2018, The Monero Project
 #
 # All rights reserved.
@@ -62,5 +62,5 @@ target_link_libraries(simplewallet
     ${EXTRA_LIBRARIES})
 set_property(TARGET simplewallet
   PROPERTY
-    OUTPUT_NAME "maze-wallet-cli")
+    OUTPUT_NAME "mask-wallet-cli")
 install(TARGETS simplewallet DESTINATION bin)

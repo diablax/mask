@@ -2,7 +2,7 @@
 
 if [ ! -d "$SNAP_USER_DATA/etc" ]; then
   mkdir $SNAP_USER_DATA/etc/
-  cp -R $SNAP/etc/mazed.conf $SNAP_USER_DATA/etc/mazed.conf
+  cp -R $SNAP/etc/maskd.conf $SNAP_USER_DATA/etc/maskd.conf
 fi
 
-exec "$SNAP/bin/mazed" "$@"
+exec "$SNAP/bin/maskd" "$@"

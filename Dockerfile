@@ -104,14 +104,14 @@ RUN apt-get update && \
 COPY --from=builder /src/build/release/bin/* /usr/local/bin/
 
 # Contains the blockchain
-VOLUME /root/.maze
+VOLUME /root/.mask
 
 # Generate your wallet via accessing the container and run:
 # cd /wallet
-# maze-wallet-cli
+# mask-wallet-cli
 VOLUME /wallet
 
 EXPOSE 38080
 EXPOSE 38081
 
-ENTRYPOINT ["mazed", "--p2p-bind-ip=0.0.0.0", "--p2p-bind-port=38080", "--rpc-bind-ip=0.0.0.0", "--rpc-bind-port=38081", "--non-interactive", "--confirm-external-bind"] 
+ENTRYPOINT ["maskd", "--p2p-bind-ip=0.0.0.0", "--p2p-bind-port=38080", "--rpc-bind-ip=0.0.0.0", "--rpc-bind-port=38081", "--non-interactive", "--confirm-external-bind"] 

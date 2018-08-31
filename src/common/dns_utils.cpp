@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2018, The Maze Project
+// Copyright (c) 2017-2018, The Mask Project
 // Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
@@ -345,8 +345,8 @@ namespace dns_utils
 // TODO: parse the string in a less stupid way, probably with regex
 std::string address_from_txt_record(const std::string& s)
 {
-  // make sure the txt record has "oa1:maze" and find it
-  auto pos = s.find("oa1:maze");
+  // make sure the txt record has "oa1:mask" and find it
+  auto pos = s.find("oa1:mask");
   if (pos == std::string::npos)
     return {};
   // search from there to find "recipient_address="
@@ -506,7 +506,7 @@ bool load_txt_records_from_dns(std::vector<std::string> &good_records, const std
 
   if (num_valid_records < 2)
   {
-    LOG_PRINT_L2("WARNING: no two valid MazePulse DNS checkpoint records were received");
+    LOG_PRINT_L2("WARNING: no two valid MaskPulse DNS checkpoint records were received");
     return false;
   }
 
@@ -528,7 +528,7 @@ bool load_txt_records_from_dns(std::vector<std::string> &good_records, const std
 
   if (good_records_index < 0)
   {
-    LOG_PRINT_L2("WARNING: no two MazePulse DNS checkpoint records matched");
+    LOG_PRINT_L2("WARNING: no two MaskPulse DNS checkpoint records matched");
     return false;
   }
 

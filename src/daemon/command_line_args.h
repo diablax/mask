@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2018, The Maze Project
+// Copyright (c) 2017-2018, The Mask Project
 // Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
@@ -36,7 +36,7 @@
 
 namespace daemon_args
 {
-  std::string const WINDOWS_SERVICE_NAME = "Maze Daemon";
+  std::string const WINDOWS_SERVICE_NAME = "Mask Daemon";
 
   const command_line::arg_descriptor<std::string, false, true, 2> arg_config_file = {
     "config-file"

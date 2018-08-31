@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2018, The Maze Project
+# Copyright (c) 2017-2018, The Mask Project
 # Copyright (c) 2014-2018, The Monero Project
 #
 # All rights reserved.
@@ -107,5 +107,5 @@ target_link_libraries(daemon
     ${EXTRA_LIBRARIES})
 set_property(TARGET daemon
   PROPERTY
-    OUTPUT_NAME "mazed")
+    OUTPUT_NAME "maskd")
 install(TARGETS daemon DESTINATION bin)

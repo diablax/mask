@@ -793,7 +793,7 @@ TEST(Serialization, portability_wallet)
   }
 }
 
-#define OUTPUT_EXPORT_FILE_MAGIC "Maze output export\003"
+#define OUTPUT_EXPORT_FILE_MAGIC "Mask output export\003"
 TEST(Serialization, portability_outputs)
 {
   // read file
@@ -909,10 +909,10 @@ TEST(Serialization, portability_outputs)
   ASSERT_TRUE(td2.m_pk_index == 0);
 }
 
-#define UNSIGNED_TX_PREFIX "Maze unsigned tx set\003"
+#define UNSIGNED_TX_PREFIX "Mask unsigned tx set\003"
 TEST(Serialization, portability_unsigned_tx)
 {
-  const boost::filesystem::path filename = unit_test::data_dir / "unsigned_maze_tx";
+  const boost::filesystem::path filename = unit_test::data_dir / "unsigned_mask_tx";
   std::string s;
   const cryptonote::network_type nettype = cryptonote::TESTNET;
   bool r = epee::file_io_utils::load_file_to_string(filename.string(), s);
@@ -1057,10 +1057,10 @@ TEST(Serialization, portability_unsigned_tx)
   ASSERT_TRUE(td2.m_pk_index == 0);
 }
 
-#define SIGNED_TX_PREFIX "Maze signed tx set\003"
+#define SIGNED_TX_PREFIX "Mask signed tx set\003"
 TEST(Serialization, portability_signed_tx)
 {
-  const boost::filesystem::path filename = unit_test::data_dir / "signed_maze_tx";
+  const boost::filesystem::path filename = unit_test::data_dir / "signed_mask_tx";
   const cryptonote::network_type nettype = cryptonote::TESTNET;
   std::string s;
   bool r = epee::file_io_utils::load_file_to_string(filename.string(), s);

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2018, The Maze Project
+// Copyright (c) 2017-2018, The Mask Project
 // Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
@@ -675,15 +675,15 @@ namespace cryptonote
     switch (std::atomic_load(&default_decimal_point))
     {
       case 12:
-        return "maze";
+        return "mask";
       case 9:
-        return "millimaze";
+        return "millimask";
       case 6:
-        return "micromaze";
+        return "micromask";
       case 3:
-        return "nanomaze";
+        return "nanomask";
       case 0:
-        return "picomaze";
+        return "picomask";
       default:
         ASSERT_MES_AND_THROW("Invalid decimal point specification: " << default_decimal_point);
     }

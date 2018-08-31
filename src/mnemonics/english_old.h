@@ -669,7 +669,7 @@ namespace Language
         "bite",
         "money",
         "protect",
-        "amaze",
+        "amask",
         "appear",
         "born",
         "choke",
