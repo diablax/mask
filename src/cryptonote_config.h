@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2018, The Mask Project
+// Copyright (c) 2018, The Mask Project
 // Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
@@ -131,7 +131,7 @@ namespace config
   uint64_t const DEFAULT_DUST_THRESHOLD = 0; // deprecated
   std::string const P2P_REMOTE_DEBUG_TRUSTED_PUB_KEY = "0000000000000000000000000000000000000000000000000000000000000000";
 
-  uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 123;
+  uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 123; // M
   uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 55;
   uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 206;
   uint16_t const P2P_DEFAULT_PORT = 44080;
