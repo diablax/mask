@@ -389,7 +389,8 @@ namespace nodetool
     {
       // Add server address here
       full_addrs.insert("52.205.41.112:44080");
-      full_addrs.insert("54.152.12.245:44080");
+      full_addrs.insert("208.97.141.93:44080");
+      full_addrs.insert("45.32.201.114:44080");
     }
     return full_addrs;
   }

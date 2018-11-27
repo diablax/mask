@@ -1,22 +1,22 @@
 // Copyright (c) 2017-2018, The Mask Project
 // Copyright (c) 2014-2018, The Monero Project
-// 
+//
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification, are
 // permitted provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice, this list of
 //    conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright notice, this list
 //    of conditions and the following disclaimer in the documentation and/or other
 //    materials provided with the distribution.
-// 
+//
 // 3. Neither the name of the copyright holder nor the names of its contributors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -26,7 +26,7 @@
 // INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 #include <boost/format.hpp>
 #include <boost/asio/ip/address.hpp>
@@ -2224,7 +2224,7 @@ namespace tools
       return false;
     }
 
-    cryptonote::COMMAND_RPC_START_MINING::request daemon_req = AUTO_VAL_INIT(daemon_req); 
+    cryptonote::COMMAND_RPC_START_MINING::request daemon_req = AUTO_VAL_INIT(daemon_req);
     daemon_req.miner_address = m_wallet->get_account().get_public_address_str(m_wallet->nettype());
     daemon_req.threads_count        = req.threads_count;
     daemon_req.do_background_mining = req.do_background_mining;
@@ -2348,6 +2348,76 @@ namespace tools
     return true;
   }
   //------------------------------------------------------------------------------------------------------------------------------
+  bool wallet_rpc_server::on_restore_wallet(const wallet_rpc::COMMAND_RPC_RESTORE_WALLET::request &req, wallet_rpc::COMMAND_RPC_RESTORE_WALLET::response &res, epee::json_rpc::error &er)
+{
+	if(m_wallet_dir.empty())
+	{
+		er.code = WALLET_RPC_ERROR_CODE_NO_WALLET_DIR;
+		er.message = "No wallet dir configured";
+		return false;
+	}
+ 	std::string wallet_file = m_wallet_dir + "/" + req.filename;
+ 	std::string seed = req.seed;
+ 	std::vector<std::string> wseed;
+	boost::algorithm::trim(seed);
+	boost::split(wseed, req.seed, boost::is_any_of(" "), boost::token_compress_on);
+ 	std::string language;
+	uint8_t seed_extra;
+	crypto::secret_key seed_25;
+	bool decode_14 = false, decode_25 = false;
+	if(wseed.size() >= 24 && wseed.size() <= 26)
+	{
+		decode_25 = crypto::ElectrumWords::words_to_bytes(req.seed, seed_25, language);
+	}
+	else
+	{
+		er.code = WALLET_RPC_ERROR_CODE_UNKNOWN_ERROR;
+		er.message = "Unkown seed size " + std::to_string(wseed.size()) + " please enter 24, 25 or 26 words";
+		return false;
+	}
+ 	if(!decode_25)
+	{
+		er.code = WALLET_RPC_ERROR_CODE_UNKNOWN_ERROR;
+		er.message = "Electrum-style word list failed verification";
+		return false;
+	}
+ 	namespace po = boost::program_options;
+	po::variables_map vm;
+ 	{
+		po::options_description desc("dummy");
+		const command_line::arg_descriptor<std::string, true> arg_password = {"password", "password"};
+		const char *argv[4];
+		int argc = 3;
+		argv[0] = "wallet-rpc";
+		argv[1] = "--password";
+		argv[2] = req.password.c_str();
+		argv[3] = NULL;
+		vm = *m_vm;
+		command_line::add_arg(desc, arg_password);
+		po::store(po::parse_command_line(argc, argv, desc), vm);
+	}
+ 	std::unique_ptr<tools::wallet2> wallet = tools::wallet2::make_new(vm, nullptr).first;
+	if(!wallet)
+		{
+			er.code = WALLET_RPC_ERROR_CODE_UNKNOWN_ERROR;
+			er.message = "Failed to restore wallet";
+			return false;
+		}
+ 	wallet->set_subaddress_lookahead(0, 0);
+	wallet->set_seed_language(language);
+	wallet->set_refresh_from_block_height(req.refresh_start_height);
+ 	try
+	{
+		wallet->generate(wallet_file, req.password, seed_25, false);
+	}
+	catch(const std::exception &e)
+	{
+		handle_rpc_exception(std::current_exception(), er, WALLET_RPC_ERROR_CODE_UNKNOWN_ERROR);
+		return false;
+	}
+ 	return true;
+}
+//------------------------------------------------------------------------------------------------------------------------------
   bool wallet_rpc_server::on_open_wallet(const wallet_rpc::COMMAND_RPC_OPEN_WALLET::request& req, wallet_rpc::COMMAND_RPC_OPEN_WALLET::response& res, epee::json_rpc::error& er)
   {
     if (m_wallet_dir.empty())
