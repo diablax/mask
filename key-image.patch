@@ -1,0 +1,31 @@
+From 5989258f3e41b6e95d37f7865ac89a87da2fdb14 Mon Sep 17 00:00:00 2001
+From: cryptochangements34 <bevanoffr@gmail.com>
+Date: Sat, 25 Aug 2018 13:40:59 -0400
+Subject: [PATCH] return with warning instead of throwing error with bad
+ pubkeys
+
+---
+ src/wallet/wallet2.cpp | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/src/wallet/wallet2.cpp b/src/wallet/wallet2.cpp
+index 0e2003bd..47800e3a 100644
+--- a/src/wallet/wallet2.cpp
++++ b/src/wallet/wallet2.cpp
+@@ -1066,9 +1066,13 @@ void wallet2::scan_output(const cryptonote::transaction &tx, const crypto::publi
+   else
+   {
+     bool r = cryptonote::generate_key_image_helper_precomp(m_account.get_keys(), boost::get<cryptonote::txout_to_key>(tx.vout[i].target).key, tx_scan_info.received->derivation, i, tx_scan_info.received->index, tx_scan_info.in_ephemeral, tx_scan_info.ki, m_account.get_device());
+-    THROW_WALLET_EXCEPTION_IF(!r, error::wallet_internal_error, "Failed to generate key image");
+-    THROW_WALLET_EXCEPTION_IF(tx_scan_info.in_ephemeral.pub != boost::get<cryptonote::txout_to_key>(tx.vout[i].target).key,
+-        error::wallet_internal_error, "key_image generated ephemeral public key not matched with output_key");
++    if(!r)
++    {
++      LOG_PRINT_L0("Failed to generate key image for tx" << get_transaction_hash(tx));
++      if(tx_scan_info.in_ephemeral.pub != boost::get<cryptonote::txout_to_key>(tx.vout[i].target).key)
++       LOG_PRINT_L0("key_image generated ephemeral public key not matched with output_key");
++      return
++    }
+   }
+ 
+   outs.push_back(i);
