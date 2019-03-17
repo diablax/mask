@@ -1,22 +1,22 @@
 // Copyright (c) 2017-2018, The Mask Project
 // Copyright (c) 2014-2018, The Monero Project
-//
+// 
 // All rights reserved.
-//
+// 
 // Redistribution and use in source and binary forms, with or without modification, are
 // permitted provided that the following conditions are met:
-//
+// 
 // 1. Redistributions of source code must retain the above copyright notice, this list of
 //    conditions and the following disclaimer.
-//
+// 
 // 2. Redistributions in binary form must reproduce the above copyright notice, this list
 //    of conditions and the following disclaimer in the documentation and/or other
 //    materials provided with the distribution.
-//
+// 
 // 3. Neither the name of the copyright holder nor the names of its contributors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
-//
+// 
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -26,7 +26,7 @@
 // INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
+// 
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
 #include "include_base_utils.h"
@@ -125,6 +125,58 @@ namespace cryptonote
     return h;
   }
   //---------------------------------------------------------------
+  bool expand_transaction_1(transaction &tx, bool base_only)
+  {
+    if (tx.version >= 1 && !is_coinbase(tx))
+    {
+      rct::rctSig &rv = tx.rct_signatures;
+      if (rv.outPk.size() != tx.vout.size())
+      {
+        LOG_PRINT_L1("Failed to parse transaction from blob, bad outPk size in tx " << get_transaction_hash(tx));
+        return false;
+      }
+      for (size_t n = 0; n < tx.rct_signatures.outPk.size(); ++n)
+      {
+        if (tx.vout[n].target.type() != typeid(txout_to_key))
+        {
+          LOG_PRINT_L1("Unsupported output type in tx " << get_transaction_hash(tx));
+          return false;
+        }
+        rv.outPk[n].dest = rct::pk2rct(boost::get<txout_to_key>(tx.vout[n].target).key);
+      }
+
+      if (!base_only)
+      {
+        const bool bulletproof = rct::is_rct_bulletproof(rv.type);
+        if (bulletproof)
+        {
+          if (rv.p.bulletproofs.size() != 1)
+          {
+            LOG_PRINT_L1("Failed to parse transaction from blob, bad bulletproofs size in tx " << get_transaction_hash(tx));
+            return false;
+          }
+          if (rv.p.bulletproofs[0].L.size() < 6)
+          {
+            LOG_PRINT_L1("Failed to parse transaction from blob, bad bulletproofs L size in tx " << get_transaction_hash(tx));
+            return false;
+          }
+          const size_t max_outputs = 1 << (rv.p.bulletproofs[0].L.size() - 6);
+          if (max_outputs < tx.vout.size())
+          {
+            LOG_PRINT_L1("Failed to parse transaction from blob, bad bulletproofs max outputs in tx " << get_transaction_hash(tx));
+            return false;
+          }
+          const size_t n_amounts = tx.vout.size();
+          CHECK_AND_ASSERT_MES(n_amounts == rv.outPk.size(), false, "Internal error filling out V");
+          rv.p.bulletproofs[0].V.resize(n_amounts);
+          for (size_t i = 0; i < n_amounts; ++i)
+            rv.p.bulletproofs[0].V[i] = rct::scalarmultKey(rv.outPk[i].mask, rct::INV_EIGHT);
+        }
+      }
+    }
+    return true;
+  }
+  //---------------------------------------------------------------
   bool parse_and_validate_tx_from_blob(const blobdata& tx_blob, transaction& tx)
   {
     std::stringstream ss;
@@ -132,6 +184,7 @@ namespace cryptonote
     binary_archive<false> ba(ss);
     bool r = ::serialization::serialize(ba, tx);
     CHECK_AND_ASSERT_MES(r, false, "Failed to parse transaction from blob");
+    CHECK_AND_ASSERT_MES(expand_transaction_1(tx, false), false, "Failed to expand transaction data");
     tx.invalidate_hashes();
     return true;
   }
@@ -143,6 +196,7 @@ namespace cryptonote
     binary_archive<false> ba(ss);
     bool r = tx.serialize_base(ba);
     CHECK_AND_ASSERT_MES(r, false, "Failed to parse transaction from blob");
+    CHECK_AND_ASSERT_MES(expand_transaction_1(tx, true), false, "Failed to expand transaction data");
     return true;
   }
   //---------------------------------------------------------------
@@ -153,6 +207,7 @@ namespace cryptonote
     binary_archive<false> ba(ss);
     bool r = ::serialization::serialize(ba, tx);
     CHECK_AND_ASSERT_MES(r, false, "Failed to parse transaction from blob");
+    CHECK_AND_ASSERT_MES(expand_transaction_1(tx, false), false, "Failed to expand transaction data");
     tx.invalidate_hashes();
     //TODO: validate tx
 
@@ -815,6 +870,9 @@ namespace cryptonote
     crypto::hash tree_root_hash = get_tx_tree_hash(b);
     blob.append(reinterpret_cast<const char*>(&tree_root_hash), sizeof(tree_root_hash));
     blob.append(tools::get_varint_data(b.tx_hashes.size()+1));
+    if (b.major_version > 1) {
+      blob.append(reinterpret_cast<const char*>(&b.uncle), sizeof(b.uncle));
+    }
     return blob;
   }
   //---------------------------------------------------------------
@@ -854,17 +912,24 @@ namespace cryptonote
   bool get_block_longhash(const block& b, crypto::hash& res, uint64_t height)
   {
     blobdata bd = get_block_hashing_blob(b);
-
+    
     int cn_variant;
-    if (b.major_version < 3) {
+    if (b.major_version < 2) {
       cn_variant = 1;
     }
     else {
-      cn_variant = 2;
+      cn_variant = 3;
     }
-
+    
     crypto::cn_slow_hash(bd.data(), bd.size(), res, cn_variant);
     return true;
+  }
+  //---------------------------------------------------------------
+  crypto::hash get_block_longhash(const block& b)
+  {
+    crypto::hash proof_of_work = null_hash;
+    get_block_longhash(b, proof_of_work, 0); // TODO-TK: address unsused height parameter
+    return proof_of_work;
   }
   //---------------------------------------------------------------
   std::vector<uint64_t> relative_output_offsets_to_absolute(const std::vector<uint64_t>& off)

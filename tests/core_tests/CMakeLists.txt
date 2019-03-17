@@ -1,3 +1,4 @@
+# Copyright (c) 2018, The Mask Project
 # Copyright (c) 2014-2018, The Monero Project
 #
 # All rights reserved.
@@ -40,8 +41,10 @@ set(core_tests_sources
   ring_signature_1.cpp
   transaction_tests.cpp
   tx_validation.cpp
+  uncles.cpp
   v2_tests.cpp
-  rct.cpp)
+  rct.cpp
+  bulletproofs.cpp)
 
 set(core_tests_headers
   block_reward.h
@@ -57,8 +60,10 @@ set(core_tests_headers
   ring_signature_1.h
   transaction_tests.h
   tx_validation.h
+  uncles.h
   v2_tests.h
-  rct.h)
+  rct.h
+  bulletproofs.h)
 
 add_executable(core_tests
   ${core_tests_sources}
@@ -73,6 +78,7 @@ target_link_libraries(core_tests
     device
     ${CMAKE_THREAD_LIBS_INIT}
     ${EXTRA_LIBRARIES})
+enable_stack_trace(core_tests)
 set_property(TARGET core_tests
   PROPERTY
     FOLDER "tests")

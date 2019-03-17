@@ -44,6 +44,17 @@ See [LICENSE](LICENSE).
 
 If you want to help out, see [CONTRIBUTING](CONTRIBUTING.md) for a set of guidelines.
 
+## Scheduled software upgrades
+
+Mask uses a fixed-schedule software upgrade (hard fork) mechanism to implement new features. This means that users of Mask (end users and service providers) should run current versions and upgrade their software on a regular schedule. The required software for these upgrades will be available prior to the scheduled date. Please check the repository prior to this date for the proper Mask software version. Below is the historical schedule and the projected schedule for the next upgrade.
+Dates are provided in the format YYYY-MM-DD. 
+
+| Fork Date         | Consensus version | Minimum Mask Version | Recommended Mask Version | Details                                                             |
+| ----------------- | ----------------- | ---------------------- | -------------------------- | --------------------------------------------------------------------|
+| 2019-04-01        | v2                | 0.3.0.0                | 0.3.0.0                    | SECOR (uncle mining) protocol (Mask), multi-output Bulletproofs, CNFastv2  |
+
+X's indicate that these details have not been determined as of commit date.
+
 ## Release staging schedule and protocol
 
 Approximately three months prior to a scheduled software upgrade, a branch from Master will be created with the new release version tag. Pull requests that address bugs should then be made to both Master and the new release branch. Pull requests that require extensive review and testing (generally, optimizations and new features) should *not* be made to the release branch.

@@ -1,3 +1,4 @@
+// Copyright (c) 2017-2018, The Mask Project
 // Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
@@ -30,6 +31,7 @@
 
 #include "chaingen.h"
 #include "chaingen_tests_list.h"
+#include "common/util.h"
 #include "common/command_line.h"
 #include "transaction_tests.h"
 
@@ -42,6 +44,7 @@ namespace
   const command_line::arg_descriptor<bool>        arg_play_test_data              = {"play_test_data", ""};
   const command_line::arg_descriptor<bool>        arg_generate_and_play_test_data = {"generate_and_play_test_data", ""};
   const command_line::arg_descriptor<bool>        arg_test_transactions           = {"test_transactions", ""};
+  const command_line::arg_descriptor<std::string> arg_filter                      = { "filter", "Regular expression filter for which tests to run" };
 }
 
 int main(int argc, char* argv[])
@@ -61,6 +64,7 @@ int main(int argc, char* argv[])
   command_line::add_arg(desc_options, arg_play_test_data);
   command_line::add_arg(desc_options, arg_generate_and_play_test_data);
   command_line::add_arg(desc_options, arg_test_transactions);
+  command_line::add_arg(desc_options, arg_filter);
 
   po::variables_map vm;
   bool r = command_line::handle_error_helper(desc_options, [&]()
@@ -77,6 +81,9 @@ int main(int argc, char* argv[])
     std::cout << desc_options << std::endl;
     return 0;
   }
+
+  const std::string filter = tools::glob_to_regex(command_line::get_arg(vm, arg_filter));
+  boost::smatch match;
 
   size_t tests_count = 0;
   std::vector<std::string> failed_tests;
@@ -123,7 +130,7 @@ int main(int argc, char* argv[])
     GENERATE_AND_PLAY(gen_block_miner_tx_has_out_to_alice);
     GENERATE_AND_PLAY(gen_block_has_invalid_tx);
     GENERATE_AND_PLAY(gen_block_is_too_big);
-    GENERATE_AND_PLAY(gen_block_invalid_binary_format); // Takes up to 3 hours, if CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW == 500, up to 30 minutes, if CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW == 10
+    //GENERATE_AND_PLAY(gen_block_invalid_binary_format); // Takes up to 3 hours, if CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW == 500, up to 30 minutes, if CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW == 10
 
     // Transaction verification tests
     GENERATE_AND_PLAY(gen_tx_big_version);
@@ -218,6 +225,42 @@ int main(int argc, char* argv[])
     GENERATE_AND_PLAY(gen_multisig_tx_invalid_33_1__no_threshold);
     GENERATE_AND_PLAY(gen_multisig_tx_invalid_33_1_2_no_threshold);
     GENERATE_AND_PLAY(gen_multisig_tx_invalid_33_1_3_no_threshold);
+
+    GENERATE_AND_PLAY(gen_uncle);
+    GENERATE_AND_PLAY(gen_uncle_reorg);
+    GENERATE_AND_PLAY(gen_uncle_alt_nephews);
+    GENERATE_AND_PLAY(gen_uncle_reorg_alt_nephews);
+    GENERATE_AND_PLAY(gen_uncle_alt_nephews_as_uncle);
+    GENERATE_AND_PLAY(gen_uncle_reorg_alt_nephews_as_uncle);
+    GENERATE_AND_PLAY(gen_uncle_is_parent);
+    GENERATE_AND_PLAY(gen_uncle_wrong_uncle);
+    GENERATE_AND_PLAY(gen_uncle_wrong_height);
+    GENERATE_AND_PLAY(gen_uncle_wrong_version);
+    GENERATE_AND_PLAY(gen_uncle_bad_ancestry);
+    GENERATE_AND_PLAY(gen_uncle_bad_timestamp);
+    //GENERATE_AND_PLAY(gen_uncle_too_far_extended_ancestry); /* TK: extended ancestry disabled for now */
+    GENERATE_AND_PLAY(gen_uncle_wrong_out);
+    GENERATE_AND_PLAY(gen_uncle_wrong_amount);
+    GENERATE_AND_PLAY(gen_uncle_overflow_amount);
+    //GENERATE_AND_PLAY(gen_uncle_hash_too_low);
+    //GENERATE_AND_PLAY(spend_uncle_original_miner_tx);
+    //GENERATE_AND_PLAY(spend_uncle_mined_txs);
+
+    GENERATE_AND_PLAY(gen_bp_tx_valid_1);
+    GENERATE_AND_PLAY(gen_bp_tx_invalid_1_1);
+    GENERATE_AND_PLAY(gen_bp_tx_valid_2);
+    GENERATE_AND_PLAY(gen_bp_tx_valid_3);
+    GENERATE_AND_PLAY(gen_bp_tx_valid_16);
+    GENERATE_AND_PLAY(gen_bp_tx_invalid_4_2_1);
+    GENERATE_AND_PLAY(gen_bp_tx_invalid_16_16);
+    GENERATE_AND_PLAY(gen_bp_txs_valid_2_and_2);
+    GENERATE_AND_PLAY(gen_bp_txs_invalid_2_and_8_2_and_16_16_1);
+    GENERATE_AND_PLAY(gen_bp_txs_valid_2_and_3_and_2_and_4);
+    GENERATE_AND_PLAY(gen_bp_tx_invalid_not_enough_proofs);
+    GENERATE_AND_PLAY(gen_bp_tx_invalid_empty_proofs);
+    GENERATE_AND_PLAY(gen_bp_tx_invalid_too_many_proofs);
+    GENERATE_AND_PLAY(gen_bp_tx_invalid_wrong_amount);
+    GENERATE_AND_PLAY(gen_bp_tx_invalid_borromean_type);
 
     el::Level level = (failed_tests.empty() ? el::Level::Info : el::Level::Error);
     MLOG(level, "\nREPORT:");

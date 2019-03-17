@@ -171,11 +171,11 @@ namespace cryptonote {
 
   difficulty_type next_difficulty_v2(std::vector<std::uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties, size_t target_seconds) {
 
-    // if (timestamps.size() > DIFFICULTY_BLOCKS_COUNT_V2)
-    // {
-    //   timestamps.resize(DIFFICULTY_BLOCKS_COUNT_V2);
-    //   cumulative_difficulties.resize(DIFFICULTY_BLOCKS_COUNT_V2);
-    // }
+    if (timestamps.size() > DIFFICULTY_BLOCKS_COUNT)
+    {
+      timestamps.resize(DIFFICULTY_BLOCKS_COUNT);
+      cumulative_difficulties.resize(DIFFICULTY_BLOCKS_COUNT);
+    }
 
     size_t length = timestamps.size();
     assert(length == cumulative_difficulties.size());
@@ -185,16 +185,16 @@ namespace cryptonote {
 
     sort(timestamps.begin(), timestamps.end());
     size_t cut_begin, cut_end;
-    // static_assert(2 * DIFFICULTY_CUT_V2 <= DIFFICULTY_BLOCKS_COUNT_V2 - 2, "Cut length is too large");
-    // if (length <= DIFFICULTY_BLOCKS_COUNT_V2 - 2 * DIFFICULTY_CUT_V2) {
-    //   cut_begin = 0;
-    //   cut_end = length;
-    // }
-    // else {
-    //   cut_begin = (length - (DIFFICULTY_BLOCKS_COUNT_V2 - 2 * DIFFICULTY_CUT_V2) + 1) / 2;
-    //   cut_end = cut_begin + (DIFFICULTY_BLOCKS_COUNT_V2 - 2 * DIFFICULTY_CUT_V2);
-    // }
-    // assert(/*cut_begin >= 0 &&*/ cut_begin + 2 <= cut_end && cut_end <= length);
+    static_assert(2 * DIFFICULTY_CUT <= DIFFICULTY_BLOCKS_COUNT - 2, "Cut length is too large");
+    if (length <= DIFFICULTY_BLOCKS_COUNT - 2 * DIFFICULTY_CUT) {
+      cut_begin = 0;
+      cut_end = length;
+    }
+    else {
+      cut_begin = (length - (DIFFICULTY_BLOCKS_COUNT - 2 * DIFFICULTY_CUT) + 1) / 2;
+      cut_end = cut_begin + (DIFFICULTY_BLOCKS_COUNT - 2 * DIFFICULTY_CUT);
+    }
+    assert(/*cut_begin >= 0 &&*/ cut_begin + 2 <= cut_end && cut_end <= length);
     uint64_t total_timespan = timestamps[cut_end - 1] - timestamps[cut_begin];
     if (total_timespan == 0) {
       total_timespan = 1;
@@ -266,11 +266,11 @@ namespace cryptonote {
   */
   difficulty_type next_difficulty_v3(std::vector<std::uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties, size_t target_seconds, bool v4) {
 
-    // if (timestamps.size() > DIFFICULTY_BLOCKS_COUNT_V3)
-    // {
-    //   timestamps.resize(DIFFICULTY_BLOCKS_COUNT_V3);
-    //   cumulative_difficulties.resize(DIFFICULTY_BLOCKS_COUNT_V3);
-    // }
+    if (timestamps.size() > DIFFICULTY_BLOCKS_COUNT)
+    {
+      timestamps.resize(DIFFICULTY_BLOCKS_COUNT);
+      cumulative_difficulties.resize(DIFFICULTY_BLOCKS_COUNT);
+    }
 
     size_t length = timestamps.size();
     assert(length == cumulative_difficulties.size());
@@ -334,6 +334,9 @@ namespace cryptonote {
     if (high != 0) {
       return 0;
     }
+    if (low < weighted_timespans) {
+      return 1;
+    }
     return low / weighted_timespans;
   }
 
@@ -361,11 +364,11 @@ namespace cryptonote {
   // be reduced from 60*60*2 to 500 seconds to prevent timestamp manipulation from miner's with
   //  > 50% hash power.  If this is too small, it can be increased to 1000 at a cost in protection.
 
-  // Cryptonote clones:  #define DIFFICULTY_BLOCKS_COUNT_V2 DIFFICULTY_WINDOW_V2 + 1
+  // Cryptonote clones:  #define DIFFICULTY_BLOCKS_COUNT DIFFICULTY_WINDOW_V2 + 1
 
-  difficulty_type next_difficulty_v6(std::vector<std::uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties, size_t target_seconds) {
+  difficulty_type next_difficulty_v6(std::vector<std::uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties, size_t version) {
 
-    const int64_t T = static_cast<int64_t>(target_seconds);
+    const int64_t T = static_cast<int64_t>(DIFFICULTY_TARGET);
     size_t N = DIFFICULTY_WINDOW;
     int64_t FTL = static_cast<int64_t>(CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT);
 
@@ -412,6 +415,11 @@ namespace cryptonote {
     // No limits should be employed, but this is correct way to employ a 20% symmetrical limit:
     // nextDifficulty=max(previous_Difficulty*0.8,min(previous_Difficulty/0.8, next_Difficulty));
     next_difficulty = static_cast<uint64_t>(nextDifficulty);
+
+    if (next_difficulty == 0) {
+      return 1;
+    }
+
     return next_difficulty;
   }
 }

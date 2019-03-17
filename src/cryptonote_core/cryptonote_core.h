@@ -368,6 +368,13 @@ namespace cryptonote
       */
      bool get_block_by_hash(const crypto::hash &h, block &blk, bool *orphan = NULL) const;
 
+      /**
+      * @copydoc fetch an uncle block from the DB
+      *
+      * @note returns false if block DNE
+      */
+      bool get_uncle_by_hash(const crypto::hash &h, block &uncle) const;
+
      /**
       * @copydoc Blockchain::get_alternative_blocks
       *
@@ -548,6 +555,16 @@ namespace cryptonote
       * @note see Blockchain::get_block_cumulative_difficulty
       */
      difficulty_type get_block_cumulative_difficulty(uint64_t height) const;
+     
+     /**
+      * @brief get a single block's weight
+      */
+     difficulty_type get_block_weight(uint64_t height) const;
+     
+     /**
+      * @brief get an uncle block's individual weight
+      */
+     difficulty_type get_uncle_weight(uint64_t height) const;
 
      /**
       * @copydoc Blockchain::get_random_outs_for_amounts
@@ -739,6 +756,13 @@ namespace cryptonote
      std::pair<uint64_t, uint64_t> get_coinbase_tx_sum(const uint64_t start_offset, const size_t count);
      
      /**
+      * @copydoc BlockchainDB::get_already_generated_coins
+      *
+      * @note BlockchainDB::get_already_generated_coins
+      */
+     uint64_t get_generated_coins(uint64_t height) const;
+     
+     /**
       * @brief get the network type we're on
       *
       * @return which network are we on?
@@ -856,9 +880,12 @@ namespace cryptonote
       * @return true if all the checks pass, otherwise false
       */
      bool check_tx_semantic(const transaction& tx, bool keeped_by_block) const;
+     void set_semantics_failed(const crypto::hash &tx_hash);
 
      bool handle_incoming_tx_pre(const blobdata& tx_blob, tx_verification_context& tvc, cryptonote::transaction &tx, crypto::hash &tx_hash, crypto::hash &tx_prefixt_hash, bool keeped_by_block, bool relayed, bool do_not_relay);
      bool handle_incoming_tx_post(const blobdata& tx_blob, tx_verification_context& tvc, cryptonote::transaction &tx, crypto::hash &tx_hash, crypto::hash &tx_prefixt_hash, bool keeped_by_block, bool relayed, bool do_not_relay);
+     struct tx_verification_batch_info { const cryptonote::transaction *tx; crypto::hash tx_hash; tx_verification_context &tvc; bool &result; };
+     bool handle_incoming_tx_accumulated_batch(std::vector<tx_verification_batch_info> &tx_info, bool keeped_by_block);
 
      /**
       * @copydoc miner::on_block_chain_update

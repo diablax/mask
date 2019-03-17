@@ -73,6 +73,10 @@
 #define DIFFICULTY_CUT                                  6
 #define DIFFICULTY_BLOCKS_COUNT                         DIFFICULTY_WINDOW + +1
 
+#define UNCLE_DIFFICULTY_TARGET                         DIFFICULTY_TARGET/4
+#define UNCLE_REWARD_RATIO                              2
+#define NEPHEW_REWARD_RATIO                             20
+
 #define DIFFICULTY_BLOCKS_ESTIMATE_TIMESPAN             DIFFICULTY_TARGET //just alias; used by tests
 
 #define CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS_V1   DIFFICULTY_TARGET * CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS
@@ -124,6 +128,8 @@
 #define HASH_OF_HASHES_STEP                     256
 
 #define DEFAULT_TXPOOL_MAX_SIZE                 648000000ull // 3 days at 300000, in bytes
+
+#define BULLETPROOF_MAX_OUTPUTS                 16
 
 // New constants are intended to go here
 namespace config

@@ -136,7 +136,7 @@ VARIANT_TAG(binary_archive, serialized_block, 0xcd);
 VARIANT_TAG(binary_archive, serialized_transaction, 0xce);
 VARIANT_TAG(binary_archive, event_visitor_settings, 0xcf);
 
-typedef boost::variant<cryptonote::block, cryptonote::transaction, cryptonote::account_base, callback_entry, serialized_block, serialized_transaction, event_visitor_settings> test_event_entry;
+typedef boost::variant<cryptonote::block, cryptonote::transaction, std::vector<cryptonote::transaction>, cryptonote::account_base, callback_entry, serialized_block, serialized_transaction, event_visitor_settings> test_event_entry;
 typedef std::unordered_map<crypto::hash, const cryptonote::transaction*> map_hash2tx_t;
 
 class test_chain_unit_base
@@ -187,7 +187,10 @@ public:
     bf_tx_hashes = 1 << 5,
     bf_diffic    = 1 << 6,
     bf_max_outs  = 1 << 7,
-    bf_hf_version= 1 << 8
+    bf_hf_version= 1 << 8,
+    bf_uncle     = 1 << 9,
+    bf_bl_reward = 1 << 10,
+    bf_ul_reward = 1 << 11
   };
 
   void get_block_chain(std::vector<block_info>& blockchain, const crypto::hash& head, size_t n) const;
@@ -208,7 +211,7 @@ public:
     const cryptonote::account_base& miner_acc, int actual_params = bf_none, uint8_t major_ver = 0,
     uint8_t minor_ver = 0, uint64_t timestamp = 0, const crypto::hash& prev_id = crypto::hash(),
     const cryptonote::difficulty_type& diffic = 1, const cryptonote::transaction& miner_tx = cryptonote::transaction(),
-    const std::vector<crypto::hash>& tx_hashes = std::vector<crypto::hash>(), size_t txs_sizes = 0, size_t max_outs = 999, uint8_t hf_version = 1, uint64_t block_fees = 0);
+    const std::vector<crypto::hash>& tx_hashes = std::vector<crypto::hash>(), size_t txs_sizes = 0, size_t max_outs = 999, uint8_t hf_version = 1, uint64_t block_fees = 0, const cryptonote::block& uncle = cryptonote::block(), uint64_t block_reward = 0, uint64_t uncle_reward = 0, uint64_t uncle_reward_ratio = UNCLE_REWARD_RATIO);
   bool construct_block_manually_tx(cryptonote::block& blk, const cryptonote::block& prev_block,
     const cryptonote::account_base& miner_acc, const std::vector<crypto::hash>& tx_hashes, size_t txs_size, uint64_t block_fees = 0);
 
@@ -262,6 +265,30 @@ bool check_tx_verification_context(const cryptonote::tx_verification_context& tv
 {
   // SFINAE in action
   return do_check_tx_verification_context(tvc, tx_added, event_index, tx, validator, 0);
+}
+//--------------------------------------------------------------------------
+template<class t_test_class>
+auto do_check_tx_verification_context(const std::vector<cryptonote::tx_verification_context>& tvcs, size_t tx_added, size_t event_index, const std::vector<cryptonote::transaction>& txs, t_test_class& validator, int)
+  -> decltype(validator.check_tx_verification_context(tvcs, tx_added, event_index, txs))
+{
+  return validator.check_tx_verification_context(tvcs, tx_added, event_index, txs);
+}
+//--------------------------------------------------------------------------
+template<class t_test_class>
+bool do_check_tx_verification_context(const std::vector<cryptonote::tx_verification_context>& tvcs, size_t tx_added, size_t /*event_index*/, const std::vector<cryptonote::transaction>& /*txs*/, t_test_class&, long)
+{
+  // Default block verification context check
+  for (const cryptonote::tx_verification_context &tvc: tvcs)
+    if (tvc.m_verifivation_failed)
+      throw std::runtime_error("Transaction verification failed");
+  return true;
+}
+//--------------------------------------------------------------------------
+template<class t_test_class>
+bool check_tx_verification_context(const std::vector<cryptonote::tx_verification_context>& tvcs, size_t tx_added, size_t event_index, const std::vector<cryptonote::transaction>& txs, t_test_class& validator)
+{
+  // SFINAE in action
+  return do_check_tx_verification_context(tvcs, tx_added, event_index, txs, validator, 0);
 }
 //--------------------------------------------------------------------------
 template<class t_test_class>
@@ -337,6 +364,26 @@ public:
     m_c.handle_incoming_tx(t_serializable_object_to_blob(tx), tvc, m_txs_keeped_by_block, false, false);
     bool tx_added = pool_size + 1 == m_c.get_pool_transactions_count();
     bool r = check_tx_verification_context(tvc, tx_added, m_ev_index, tx, m_validator);
+    CHECK_AND_NO_ASSERT_MES(r, false, "tx verification context check failed");
+    return true;
+  }
+
+  bool operator()(const std::vector<cryptonote::transaction>& txs) const
+  {
+    log_event("cryptonote::transaction");
+
+    std::list<cryptonote::blobdata> tx_blobs;
+    std::vector<cryptonote::tx_verification_context> tvcs;
+     cryptonote::tx_verification_context tvc0 = AUTO_VAL_INIT(tvc0);
+    for (const auto &tx: txs)
+    {
+      tx_blobs.push_back(t_serializable_object_to_blob(tx));
+      tvcs.push_back(tvc0);
+    }
+    size_t pool_size = m_c.get_pool_transactions_count();
+    m_c.handle_incoming_txs(tx_blobs, tvcs, m_txs_keeped_by_block, false, false);
+    size_t tx_added = m_c.get_pool_transactions_count() - pool_size;
+    bool r = check_tx_verification_context(tvcs, tx_added, m_ev_index, txs, m_validator);
     CHECK_AND_NO_ASSERT_MES(r, false, "tx verification context check failed");
     return true;
   }
@@ -586,6 +633,32 @@ inline bool do_replay_file(const std::string& filename)
   generator.construct_block(BLK_NAME, PREV_BLOCK, MINER_ACC);                         \
   VEC_EVENTS.push_back(BLK_NAME);
 
+#define PUSH_NEXT_BLOCKVD(VEC_EVENTS, BLK_NAME, PREV_BLOCK, MINER_ACC, MAJOR_VER, DIFFICULTY) \
+  generator.construct_block_manually(BLK_NAME, PREV_BLOCK, MINER_ACC, test_generator::bf_major_ver | test_generator::bf_minor_ver | test_generator::bf_hf_version | test_generator::bf_diffic, MAJOR_VER, MAJOR_VER, 0, crypto::hash(), DIFFICULTY, transaction(), std::vector<crypto::hash>(), 0, 0, MAJOR_VER);         \
+  VEC_EVENTS.push_back(BLK_NAME);
+
+#define MAKE_NEXT_BLOCKVD(VEC_EVENTS, BLK_NAME, PREV_BLOCK, MINER_ACC, MAJOR_VER, DIFFICULTY) \
+  cryptonote::block BLK_NAME;                                                         \
+  PUSH_NEXT_BLOCKVD(VEC_EVENTS, BLK_NAME, PREV_BLOCK, MINER_ACC, MAJOR_VER, DIFFICULTY);
+
+#define MAKE_NEXT_BLOCKV(VEC_EVENTS, BLK_NAME, PREV_BLOCK, MINER_ACC, MAJOR_VER) \
+  MAKE_NEXT_BLOCKVD(VEC_EVENTS, BLK_NAME, PREV_BLOCK, MINER_ACC, MAJOR_VER, 1);
+
+#define PUSH_NEXT_BLOCKVD_UNCLE(VEC_EVENTS, BLK_NAME, PREV_BLOCK, MINER_ACC, MAJOR_VER, UNCLE, DIFFICULTY) \
+  generator.construct_block_manually(BLK_NAME, PREV_BLOCK, MINER_ACC, test_generator::bf_major_ver | test_generator::bf_minor_ver | test_generator::bf_hf_version | test_generator::bf_uncle | test_generator::bf_diffic, MAJOR_VER, MAJOR_VER, 0, crypto::hash(), 0, transaction(), std::vector<crypto::hash>(), DIFFICULTY, 0, MAJOR_VER, 0, UNCLE); \
+  VEC_EVENTS.push_back(BLK_NAME);
+
+#define PUSH_NEXT_BLOCKV_UNCLE(VEC_EVENTS, BLK_NAME, PREV_BLOCK, MINER_ACC, MAJOR_VER, UNCLE) \
+  PUSH_NEXT_BLOCKVD_UNCLE(VEC_EVENTS, BLK_NAME, PREV_BLOCK, MINER_ACC, MAJOR_VER, UNCLE, 1);
+
+#define MAKE_NEXT_BLOCKVD_UNCLE(VEC_EVENTS, BLK_NAME, PREV_BLOCK, MINER_ACC, MAJOR_VER, UNCLE, DIFFICULTY) \
+  cryptonote::block BLK_NAME;                                                         \
+  BLK_NAME.uncle = cryptonote::get_block_hash(UNCLE);                                                \
+  PUSH_NEXT_BLOCKVD_UNCLE(VEC_EVENTS, BLK_NAME, PREV_BLOCK, MINER_ACC, MAJOR_VER, UNCLE, DIFFICULTY);
+
+#define MAKE_NEXT_BLOCKV_UNCLE(VEC_EVENTS, BLK_NAME, PREV_BLOCK, MINER_ACC, MAJOR_VER, UNCLE) \
+  MAKE_NEXT_BLOCKVD_UNCLE(VEC_EVENTS, BLK_NAME, PREV_BLOCK, MINER_ACC, MAJOR_VER, UNCLE, 1);
+
 #define MAKE_NEXT_BLOCK_TX1(VEC_EVENTS, BLK_NAME, PREV_BLOCK, MINER_ACC, TX1)         \
   cryptonote::block BLK_NAME;                                                           \
   {                                                                                   \
@@ -611,6 +684,21 @@ inline bool do_replay_file(const std::string& filename)
     }                                                                                 \
     BLK_NAME = _blk_last;                                                             \
   }
+
+#define REWIND_BLOCKS_VDN(VEC_EVENTS, BLK_NAME, PREV_BLOCK, MINER_ACC, MAJOR_VER, COUNT, DIFFICULTY) \
+  cryptonote::block BLK_NAME;                                                           \
+  {                                                                                     \
+    cryptonote::block _blk_last = PREV_BLOCK;                                           \
+    for (size_t i = 0; i < COUNT; ++i)                                                  \
+    {                                                                                   \
+      MAKE_NEXT_BLOCKVD(VEC_EVENTS, blk, _blk_last, MINER_ACC, MAJOR_VER, DIFFICULTY);  \
+      _blk_last = blk;                                                                  \
+    }                                                                                   \
+    BLK_NAME = _blk_last;                                                               \
+  }
+
+#define REWIND_BLOCKS_VN(VEC_EVENTS, BLK_NAME, PREV_BLOCK, MINER_ACC, MAJOR_VER, COUNT) \
+  REWIND_BLOCKS_VDN(VEC_EVENTS, BLK_NAME, PREV_BLOCK, MINER_ACC, MAJOR_VER, COUNT, 1)
 
 #define REWIND_BLOCKS(VEC_EVENTS, BLK_NAME, PREV_BLOCK, MINER_ACC) REWIND_BLOCKS_N(VEC_EVENTS, BLK_NAME, PREV_BLOCK, MINER_ACC, CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW)
 
@@ -666,6 +754,7 @@ inline bool do_replay_file(const std::string& filename)
     }
 
 #define GENERATE_AND_PLAY(genclass)                                                                        \
+  if (filter.empty() || boost::regex_match(std::string(#genclass), match, boost::regex(filter)))           \
   {                                                                                                        \
     std::vector<test_event_entry> events;                                                                  \
     ++tests_count;                                                                                         \
