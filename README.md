@@ -51,7 +51,7 @@ Dates are provided in the format YYYY-MM-DD.
 
 | Fork Date         | Consensus version | Minimum Mask Version | Recommended Mask Version | Details                                                             |
 | ----------------- | ----------------- | ---------------------- | -------------------------- | --------------------------------------------------------------------|
-| 2019-04-01        | v2                | 0.3.0.0                | 0.3.0.0                    | SECOR (uncle mining) protocol (Mask), multi-output Bulletproofs, CNFastv2  |
+| 2019-04-01        | v2                | 0.3.0.0                | 0.3.0.0                    | SECOR (uncle mining) protocol (Masari), multi-output Bulletproofs, CNFastv2  |
 
 X's indicate that these details have not been determined as of commit date.
 
